@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1>Результат теста</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Тест: {{ result.test.title }}</h5>
+            {% if result.total_questions > 0 %}
+                <p class="card-text">
+                    По вопросам с автопроверкой: <strong>{{ result.score }} из {{ result.total_questions }}</strong>
+                    ({{ "%.1f"|format((result.score / result.total_questions) * 100) }}%).
+                </p>
+            {% else %}
+                <p class="card-text text-muted">В этом тесте нет вопросов с автоматической проверкой (только файлы или пустой тест).</p>
+            {% endif %}
+            {% if result.file_submissions %}
+                <p class="card-text">Файлов ответов на проверку у учителя: <strong>{{ result.file_submissions|length }}</strong>.</p>
+            {% endif %}
+            <p class="card-text">
+                <small class="text-muted">Завершено: {{ result.completed_at.strftime('%d.%m.%Y %H:%M') }}</small>
+            </p>
+            <a href="{{ url_for('view_test', test_id=result.test.id) }}" class="btn btn-primary">Вернуться к тесту</a>
+            <a href="{{ url_for('tests') }}" class="btn btn-secondary">К списку тестов</a>
+        </div>
+    </div>
+{% endblock %}

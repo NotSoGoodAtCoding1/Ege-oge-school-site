@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-4">Панель администратора</h1>
+<table class="table table-bordered mb-4">
+  <tr>
+    <td class="text-center">Пользователи<br><strong class="fs-2">{{ stats.users }}</strong></td>
+    <td class="text-center">Студенты<br><strong class="fs-2">{{ stats.students }}</strong></td>
+    <td class="text-center">Курсы<br><strong class="fs-2">{{ stats.courses }}</strong></td>
+    <td class="text-center">Файлы ожидают<br><strong class="fs-2">{{ stats.pending_files }}</strong></td>
+    <td class="text-center">Домашние задания ожидают<br><strong class="fs-2">{{ stats.pending_hw }}</strong></td>
+    <td class="text-center">Неактивные<br><strong class="fs-2">{{ stats.inactive }}</strong></td>
+  </tr>
+</table>
+<p class="mb-4">
+  <a class="btn btn-primary btn-sm" href="{{ url_for('admin_user_form') }}">Новый пользователь</a>
+  <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_users_import') }}">Импорт</a>
+  <a class="btn btn-primary btn-sm" href="{{ url_for('admin_course_form') }}">Новый курс</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('teacher_dashboard') }}">Кабинет учителя</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_analytics') }}">Аналитика</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_reports') }}">Отчеты</a>
+</p>
+<h2 class="h5">Последние входы</h2>
+<ul class="list-group">
+  {% for ev in recent_logins %}
+  <li class="list-group-item d-flex justify-content-between">
+    <span>{{ ev.user.full_name or ev.user.username }}</span>
+    <span class="text-muted small">{{ ev.logged_at.strftime('%d.%m.%Y %H:%M') }}</span>
+  </li>
+  {% else %}
+  <li class="list-group-item text-muted">Нет данных</li>
+  {% endfor %}
+</ul>
+{% endblock %}

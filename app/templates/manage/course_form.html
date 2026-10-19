@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-3">{{ title }}</h1>
+<form method="post" class="col-lg-8">
+  {{ form.hidden_tag() }}
+  <p class="mb-3">{{ form.title.label(class="form-label") }}{{ form.title(class="form-control") }}</p>
+  <p class="mb-3">{{ form.description.label(class="form-label") }}{{ form.description(class="form-control", rows=4) }}</p>
+  <p class="mb-3">{{ form.subject.label(class="form-label") }}{{ form.subject(class="form-select") }}</p>
+  <p class="mb-3">{{ form.school_class.label(class="form-label") }}{{ form.school_class(class="form-select") }}</p>
+  <p class="mb-3">{{ form.author_id.label(class="form-label") }}{{ form.author_id(class="form-select") }}</p>
+  <p class="mb-3">{{ form.teacher_ids.label(class="form-label") }}{{ form.teacher_ids(class="form-select", size=6, multiple=true) }}</p>
+  {{ form.submit(class="btn btn-primary") }}
+  <a class="btn btn-secondary" href="{{ url_for('admin_courses') }}">Отмена</a>
+</form>
+{% endblock %}

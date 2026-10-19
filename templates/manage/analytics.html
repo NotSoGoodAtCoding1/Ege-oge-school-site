@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-4">Аналитика</h1>
+<canvas id="loginChart" height="80" class="mb-4"></canvas>
+<table class="table table-bordered">
+  <thead><tr><th>Курс</th><th>Зарегистрировано</th><th>Попытки тестов</th><th>Просмотры материалов</th></tr></thead>
+  <tbody>
+  {% for row in course_stats %}
+  <tr>
+    <td>{{ row.course.title }}</td>
+    <td>{{ row.enrolled }}</td>
+    <td>{{ row.attempts }}</td>
+    <td>{{ row.views }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const ctx = document.getElementById('loginChart');
+if (ctx && typeof Chart !== 'undefined') {
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels | tojson }},
+      datasets: [{ label: 'Logins', data: {{ chart_values | tojson }}, borderColor: '#000', tension: 0.2 }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+}
+</script>
+{% endblock %}

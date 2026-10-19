@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="h2 mb-4">Кабинет учителя</h1>
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card h-100 border-warning">
+      <div class="card-body">
+        <h5 class="card-title">Ответы файлами (ожидают)</h5>
+        <p class="card-text display-6">{{ pending_file_reviews }}</p>
+        <a href="{{ url_for('teacher_file_reviews') }}" class="btn btn-outline-primary btn-sm">Проверить</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-secondary">
+      <div class="card-body">
+        <h5 class="card-title">Домашние работы (не проверены)</h5>
+        <p class="card-text display-6">{{ pending_homework_reviews }}</p>
+        <a href="{{ url_for('teacher_courses') }}" class="btn btn-outline-secondary btn-sm">К курсам</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Курсы</h5>
+        <p class="text-muted small">Материалы, расписание, ДЗ, тесты</p>
+        <a href="{{ url_for('teacher_courses') }}" class="btn btn-primary btn-sm">Мои курсы</a>
+        <a href="{{ url_for('teacher_course_new') }}" class="btn btn-outline-primary btn-sm">Новый курс</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-header fw-semibold">Новое объявление</div>
+  <div class="card-body">
+    <p class="small text-muted mb-3">Объявление появится на главной странице у всех авторизованных пользователей.</p>
+    <form method="post">
+      {{ ann_form.hidden_tag() }}
+      <div class="mb-3">
+        {{ ann_form.title.label(class="form-label") }}
+        {{ ann_form.title(class="form-control") }}
+        {% for e in ann_form.title.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="mb-3">
+        {{ ann_form.body.label(class="form-label") }}
+        {{ ann_form.body(class="form-control", rows=4) }}
+        {% for e in ann_form.body.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary">{{ ann_form.submit.label.text }}</button>
+    </form>
+  </div>
+</div>
+
+<h2 class="h5 mb-2">Курсы</h2>
+{% if courses %}
+<ul class="list-group">
+  {% for c in courses %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <span>{{ c.title }}</span>
+    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('teacher_course_hub', course_id=c.id) }}">Открыть</a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="text-muted">Пока нет курсов.</p>
+{% endif %}
+{% endblock %}

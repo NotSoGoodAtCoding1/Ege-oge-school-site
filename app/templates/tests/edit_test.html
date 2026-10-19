@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extra_css %}
+<style>
+  .btn-outline-secondary {
+    max-height: 2.5rem;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('tests') }}">Tests</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('view_test', test_id=test.id) }}">{{ test.title }}</a></li>
+    <li class="breadcrumb-item active">Редактировать</li>
+  </ol>
+</nav>
+<div class="d-flex flex-wrap justify-content-between gap-2 mb-4">
+  <div>
+    <h1 class="h2 mb-1">{{ test.title }}</h1>
+    <p class="text-muted mb-0">
+      Курс: {{ test.course.title if test.course else "n/a" }}
+      {% if test.course %} &middot; <a href="{{ url_for('course_tests', course_id=test.course.id) }}">Тесты курса</a>{% endif %}
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('view_test', test_id=test.id) }}">Предпросмотр</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('tests') }}">Все тесты</a>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold">Добавить вопрос</div>
+      <div class="card-body">
+        <p class="small text-muted">Для «текстовый ответ» и «файл» блок вариантов не используется — укажите эталон или проверку вручную.</p>
+        <form method="POST">
+          {{ qform.hidden_tag() }}
+          <div class="mb-3">{{ qform.question_type.label(class="form-label") }}{{ qform.question_type(class="form-select", id="question_type_select") }}</div>
+          <div class="mb-3">
+            {{ qform.text.label(class="form-label") }}
+            {{ qform.text(class="form-control", rows=4) }}
+            {% for e in qform.text.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3" id="correct-answer-panel">
+            {{ qform.correct_answer.label(class="form-label") }}
+            {{ qform.correct_answer(class="form-control", placeholder="Например: 42 или Москва") }}
+            <div class="form-text">Сравнение без учёта регистра и пробелов по краям.</div>
+            {% for e in qform.correct_answer.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3" id="options-panel">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+              <label class="form-label mb-0">Варианты ответов</label>
+              <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="options-remove-btn" title="Убрать вариант" aria-label="Убрать вариант">−</button>
+                <span class="small text-muted" id="options-count-label"></span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="options-add-btn" title="Добавить вариант" aria-label="Добавить вариант">+</button>
+              </div>
+            </div>
+            <p class="small text-muted">От 2 до 50 вариантов. Как минимум один «правильный».</p>
+            <div class="vstack gap-2" id="options-list">
+              {% for opt in qform.options %}
+                <div class="input-group input-group-sm option-row">
+                  <span class="input-group-text option-row-num">{{ loop.index }}</span>
+                  {{ opt.form.text(class="form-control option-text", placeholder="Текст варианта") }}
+                  <div class="input-group-text">
+                    {{ opt.form.is_correct(class="form-check-input mt-0 option-correct") }}
+                    <span class="ms-1 small">правильный</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">{{ qform.submit.label.text }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold">Вопросы ({{ test.questions|length }})</div>
+      <div class="list-group list-group-flush">
+        {% if test.questions %}
+          {% for q in test.questions %}
+            <div class="list-group-item">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div class="flex-grow-1">
+                  <div class="mb-1">
+                    {% set qt = q.question_type or 'single_choice' %}
+                    {% if qt == 'single_choice' %}
+                      <span class="badge text-bg-primary">Один верный ответ</span>
+                    {% elif qt == 'multiple_choice' %}
+                      <span class="badge text-bg-info text-dark">Несколько верных ответов</span>
+                    {% elif qt == 'text_answer' %}
+                      <span class="badge text-bg-secondary">Текстовый ответ</span>
+                    {% else %}
+                      <span class="badge text-bg-warning text-dark">Файл / скан</span>
+                    {% endif %}
+                  </div>
+                  <p class="mb-2">{{ q.text }}</p>
+                  {% if qt == 'text_answer' %}
+                    <p class="small mb-0">Верный ответ: <strong>{% for o in q.options if o.is_correct %}{{ o.text }}{% else %}—{% endfor %}</strong></p>
+                  {% elif qt != 'file_upload' and q.options %}
+                    <ul class="small mb-0 ps-3">
+                      {% for o in q.options %}
+                        <li>
+                          {{ o.text }}
+                          {% if current_user.is_authenticated and current_user.role in ['teacher', 'admin'] and o.is_correct %}
+                            <span class="badge bg-success">правильный</span>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% elif qt == 'file_upload' %}
+                    <p class="small text-muted mb-0">Оценка вручную учителем после загрузки файла.</p>
+                  {% endif %}
+                </div>
+                <form method="post" action="{{ url_for('delete_question', test_id=test.id, question_id=q.id) }}" onsubmit="return confirm('Delete this question?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="list-group-item text-muted">Вопросов нет.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var MIN_OPTIONS = 2;
+  var MAX_OPTIONS = 50;
+  var sel = document.getElementById('question_type_select');
+  var panel = document.getElementById('options-panel');
+  var correctPanel = document.getElementById('correct-answer-panel');
+  var list = document.getElementById('options-list');
+  var addBtn = document.getElementById('options-add-btn');
+  var removeBtn = document.getElementById('options-remove-btn');
+  var countLabel = document.getElementById('options-count-label');
+
+  function optionRows() {
+    return list ? Array.prototype.slice.call(list.querySelectorAll('.option-row')) : [];
+  }
+
+  function renumberOptionRows() {
+    optionRows().forEach(function (row, i) {
+      var num = row.querySelector('.option-row-num');
+      var text = row.querySelector('.option-text');
+      var correct = row.querySelector('.option-correct');
+      if (num) num.textContent = String(i + 1);
+      if (text) text.name = 'options-' + i + '-text';
+      if (correct) correct.name = 'options-' + i + '-is_correct';
+    });
+    updateOptionButtons();
+  }
+
+  function updateOptionButtons() {
+    var n = optionRows().length;
+    if (countLabel) countLabel.textContent = n + ' / ' + MAX_OPTIONS;
+    if (addBtn) addBtn.disabled = n >= MAX_OPTIONS;
+    if (removeBtn) removeBtn.disabled = n <= MIN_OPTIONS;
+  }
+
+  function cloneOptionRow() {
+    var rows = optionRows();
+    if (!rows.length || rows.length >= MAX_OPTIONS) return;
+    var clone = rows[rows.length - 1].cloneNode(true);
+    var text = clone.querySelector('.option-text');
+    var correct = clone.querySelector('.option-correct');
+    if (text) text.value = '';
+    if (correct) correct.checked = false;
+    list.appendChild(clone);
+    renumberOptionRows();
+  }
+
+  function removeOptionRow() {
+    var rows = optionRows();
+    if (rows.length <= MIN_OPTIONS) return;
+    rows[rows.length - 1].remove();
+    renumberOptionRows();
+  }
+
+  if (addBtn) addBtn.addEventListener('click', cloneOptionRow);
+  if (removeBtn) removeBtn.addEventListener('click', removeOptionRow);
+  renumberOptionRows();
+
+  if (!sel) return;
+  function syncTypePanels() {
+    var t = sel.value;
+    if (panel) panel.style.display = (t === 'file_upload' || t === 'text_answer') ? 'none' : 'block';
+    if (correctPanel) correctPanel.style.display = t === 'text_answer' ? 'block' : 'none';
+  }
+  sel.addEventListener('change', syncTypePanels);
+  syncTypePanels();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="h2 mb-3">Кабинет родителя</h1>
+
+{% if children|length > 1 %}
+<div class="mb-3">
+  <label class="form-label">Ученик</label>
+  <select class="form-select form-select-sm" style="max-width: 20rem" onchange="if (this.value) location.href='{{ url_for('parent_dashboard') }}?student_id='+this.value;">
+    {% for ch in children %}
+    <option value="{{ ch.id }}" {% if student and ch.id == student.id %}selected{% endif %}>{{ ch.username }}</option>
+    {% endfor %}
+  </select>
+</div>
+{% elif not children %}
+<div class="alert alert-info">
+  К учётной записи пока не привязаны ученики. Администратор может указать вас как родителя в карточке ученика.
+</div>
+{% endif %}
+
+{% if student %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card h-100 border-primary">
+      <div class="card-body py-3">
+        <div class="text-muted small">Посещаемость в этом месяце</div>
+        {% if absence_count_month == 0 %}
+        <div class="fs-5 fw-semibold text-success lh-sm">Ваш ребёнок всё посещает</div>
+        {% elif absence_count_month == 1 %}
+        <div class="fs-5 fw-semibold lh-sm">1 пропуск</div>
+        <div class="small text-muted">в текущем месяце</div>
+        {% else %}
+        <div class="display-6">{{ absence_count_month }}</div>
+        <div class="small text-muted">пропусков в этом месяце</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100 border-success">
+      <div class="card-body py-3">
+        <div class="text-muted small">На ближайшую неделю</div>
+        {% if stat_upcoming > 0 %}
+        <div class="display-6">{{ stat_upcoming }}</div>
+        <div class="small text-muted">занятий запланировано</div>
+        {% elif next_lesson %}
+        <div class="fs-6 fw-semibold lh-sm">Следующее занятие</div>
+        <div class="small mt-1">{{ next_lesson.start_time.strftime('%d.%m.%Y в %H:%M') }}</div>
+        <div class="small text-muted">{{ next_lesson.course.title }}</div>
+        {% else %}
+        <div class="fs-6 fw-semibold lh-sm text-muted">Занятий пока не запланировано</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100 border-warning">
+      <div class="card-body py-3">
+        <div class="text-muted small">Домашние задания</div>
+        {% if stat_pending_hw == 0 %}
+        <div class="fs-5 fw-semibold text-success lh-sm">Всё выполнено</div>
+        <div class="small text-muted">или заданий нет</div>
+        {% elif stat_pending_hw == 1 %}
+        <div class="fs-5 fw-semibold lh-sm">1 задание</div>
+        <div class="small text-muted">ждёт выполнения</div>
+        {% else %}
+        <div class="display-6">{{ stat_pending_hw }}</div>
+        <div class="small text-muted">ждут выполнения</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100">
+      <div class="card-body py-3">
+        <div class="text-muted small">Прогресс по курсам</div>
+        {% if not progress_has_data %}
+        <div class="fs-5 fw-semibold text-muted lh-sm">Нет данных</div>
+        <div class="small text-muted">пока нечего оценивать</div>
+        {% else %}
+        {% set prog = overall_progress|round(0)|int %}
+        <div class="display-6">{{ prog }}%</div>
+        <div class="small text-muted">средний по курсам</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Посещаемость</div>
+      <div class="card-body">
+        {% if absence_count_month == 0 %}
+        <p class="mb-3 text-success">В этом месяце пропусков не отмечено — ребёнок ходит на занятия.</p>
+        {% elif absence_count_month == 1 %}
+        <p class="mb-3 text-muted">В этом месяце отмечен один пропуск. При необходимости уточните детали у учителя.</p>
+        {% else %}
+        <p class="mb-3 text-muted">В этом месяце отмечено пропусков: <strong>{{ absence_count_month }}</strong>. Если что-то непонятно — можно спокойно уточнить у учителя.</p>
+        {% endif %}
+        {% if recent_attendance %}
+        <div class="table-responsive">
+          <table class="table table-sm table-striped mb-0">
+            <thead><tr><th>Дата</th><th>Предмет / тема</th><th>Статус</th></tr></thead>
+            <tbody>
+              {% for row in recent_attendance %}
+              {% set sch = row.schedule %}
+              <tr>
+                <td>{{ sch.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td>{{ sch.course.title }} — {{ sch.topic }}</td>
+                <td>{{ attendance_labels.get(row.status, row.status) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Отметок посещаемости пока нет — учитель добавит их после занятий.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Расписание</div>
+      <div class="card-body">
+        {% if upcoming_lessons %}
+        <p class="small text-muted mb-2">Занятия на ближайшие 7 дней:</p>
+        <ul class="list-group list-group-flush">
+          {% for les in upcoming_lessons %}
+          {% set teacher = les.course.author.username if les.course.author else '—' %}
+          <li class="list-group-item px-0">
+            <div class="fw-medium">{{ les.course.title }} — {{ les.topic }}</div>
+            <div class="small text-muted">{{ les.start_time.strftime('%d.%m.%Y %H:%M') }} – {{ les.end_time.strftime('%H:%M') }}{% if teacher != '—' %}, {{ teacher }}{% endif %}</div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% elif next_lesson %}
+        <p class="mb-2">На этой неделе занятий в расписании нет. Ближайшее:</p>
+        <div class="p-3 bg-light rounded">
+          <div class="fw-medium">{{ next_lesson.course.title }} — {{ next_lesson.topic }}</div>
+          <div class="small text-muted mt-1">{{ next_lesson.start_time.strftime('%d.%m.%Y в %H:%M') }} – {{ next_lesson.end_time.strftime('%H:%M') }}</div>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Следующие занятия ещё не добавлены в расписание. Как только учитель их опубликует, они появятся здесь.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Домашние задания</div>
+      <div class="card-body">
+        {% if pending_homework_rows %}
+        <p class="small text-muted mb-2">Сейчас в работе:</p>
+        <ul class="list-group list-group-flush">
+          {% for item in pending_homework_rows %}
+          {% set hw = item.homework %}
+          <li class="list-group-item px-0 d-flex justify-content-between align-items-start gap-2">
+            <div>
+              <div class="fw-medium">{{ hw.title }}</div>
+              <div class="small text-muted">{{ item.course.title }}</div>
+            </div>
+            <div class="text-nowrap small text-muted">
+              {% if hw.deadline %}
+              до {{ hw.deadline.strftime('%d.%m.%Y %H:%M') }}
+              {% else %}
+              без срока
+              {% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted mb-0">Сейчас нет заданий, которые ждут выполнения. Отличная новость!</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Прохождение курсов</div>
+      <div class="card-body">
+        {% if not progress_has_data %}
+        <p class="mb-0 text-muted">Пока нет тестов и домашних заданий, по которым можно посчитать прогресс. Как только появятся материалы — здесь будет наглядная картина.</p>
+        {% else %}
+        {% set prog = overall_progress|round(0)|int %}
+        <p class="small text-muted mb-2">Сводный показатель по курсам ребёнка (тесты и домашние задания).</p>
+        <div class="progress" style="height: 1.75rem;">
+          <div class="progress-bar{% if prog >= 50 %} bg-success{% endif %}" role="progressbar" style="width: {{ [prog, 100]|min }}%;"
+               aria-valuenow="{{ prog }}" aria-valuemin="0" aria-valuemax="100">
+            {{ prog }}%
+          </div>
+        </div>
+        {% if prog == 0 %}
+        <p class="small text-muted mt-2 mb-0">Прогресс только начинается — это нормально в начале обучения.</p>
+        {% elif prog < 30 %}
+        <p class="small text-muted mt-2 mb-0">Ребёнок в процессе — главное регулярность, а не спешка.</p>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

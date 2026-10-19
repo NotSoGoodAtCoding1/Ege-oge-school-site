@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ teacher.full_name }}{% endblock %}
+{% block content %}
+<nav class="mb-4">
+  <a href="{{ url_for('index') }}#teachers" class="text-decoration-none">&larr; Наши преподаватели</a>
+</nav>
+<article class="teacher-profile">
+  <div class="teacher-profile-photo-wrap">
+    <img
+      src="{{ teacher.photo_url }}"
+      alt="Фото: {{ teacher.full_name }}"
+      class="teacher-profile-photo"
+    />
+  </div>
+  <div class="teacher-profile-body">
+    <h1 class="teacher-profile-name">{{ teacher.full_name }}</h1>
+    <p class="teacher-profile-tagline text-muted">{{ teacher.tagline }}</p>
+    <dl class="teacher-profile-details">
+      <dt>Электронная почта</dt>
+      <dd><a href="mailto:{{ teacher.email }}">{{ teacher.email }}</a></dd>
+      <dt>Квалификация</dt>
+      <dd class="teacher-profile-qualifications">{{ teacher.qualifications }}</dd>
+    </dl>
+  </div>
+</article>
+{% endblock %}

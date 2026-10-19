@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extra_css %}
+    <style data-tag="reset-style-sheet">
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}pre {  white-space: normal;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}html { scroll-behavior: smooth  }
+    </style>
+    <style data-tag="default-style-sheet">
+      html {
+        font-family: Inter;
+        ::webkit-scrollbar {
+          display: none;
+        }
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        fill: var(--dl-color-theme-neutral-dark);
+        font-size: 16px;
+      }
+      header.navbar8-thq-navbar-interactive-elm {
+        background-color: #f5f5f500;
+      }
+      body {
+        font-weight: 400;
+        font-style:normal;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.15;
+        color: var(--dl-color-theme-neutral-dark);
+        background: var(--dl-color-theme-neutral-light);
+        
+      }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/animate.css@4.1.1/animate.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" data-tag="font" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;display=swap" data-tag="font" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" data-tag="font" />
+   
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block wrapper %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container mt-2 px-3">
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<div class="home-container1">
+        {% include 'includes/navbar.html' %}
+        <div id="home" class="home-container2{% if current_user.is_authenticated %} home-container2--board{% endif %}">
+          {% if current_user.is_authenticated %}
+          <section class="home-announcements-board" aria-labelledby="announcements-heading">
+            <h2 id="announcements-heading" class="home-announcements-title">Объявления</h2>
+            <div class="home-announcements-list">
+              {% if announcements %}
+                {% for item in announcements %}
+                <article class="home-announcement-card">
+                  <h3 class="home-announcement-card-title">{{ item.title }}</h3>
+                  <p class="home-announcement-meta">
+                    {{ item.author.full_name or item.author.username }}
+                    &middot;
+                    {{ item.created_at.strftime('%d.%m.%Y %H:%M') }}
+                  </p>
+                  <div class="home-announcement-body">{{ item.body }}</div>
+                </article>
+                {% endfor %}
+              {% else %}
+                <p class="home-announcements-empty">Пока нет объявлений.</p>
+              {% endif %}
+            </div>
+          </section>
+          {% else %}
+          <span class="home-text24">
+            <span class="home-text25">Подготовка к ЕГЭ и</span>
+            <br class="home-text26" />
+            <span class="home-text27">ОГЭ — просто,</span>
+            <br class="home-text28" />
+            <span class="home-text29">эффективно, доступно!</span>
+            <span></span>
+          </span>
+          {% endif %}
+          <div class="home-container3">
+            {% if current_user.is_authenticated %}
+            <a href="{{ cabinet_url() }}" class="home-button1 button thq-link">Личный кабинет</a>
+            {% if show_student_tests_nav() %}
+            <a href="{{ url_for('tests') }}" class="home-button2 button thq-link">Тесты</a>
+            {% endif %}
+            {% else %}
+            <a href="{{ url_for('register') }}" class="home-button1 button thq-link">Зарегистрироваться</a>
+            <a href="{{ url_for('login') }}" class="home-button2 button thq-link">Уже есть аккаунт</a>
+            {% endif %}
+          </div>
+        </div>
+        <features26-wrapper
+          class="features26-wrapper"
+          rootclassname="features26undefined"
+        >
+          <!--Features26 component-->
+          <div
+            id="teachers"
+            class="features26-thq-layout300-elm thq-section-padding features26root-class-name"
+          >
+            <div class="features26-thq-max-width-elm thq-section-max-width">
+              <div class="features26-thq-section-title-elm">
+                <div class="features26-thq-content-elm1">
+                  <h2 class="features26-thq-text-elm thq-heading-2">
+                    <fragment class="home-fragment24">
+                      <span class="home-text31">Наши преподаватели</span>
+                    </fragment>
+                  </h2>
+                </div>
+              </div>
+              <div class="features26-thq-content-elm2">
+                <div class="features26-thq-row-elm thq-flex-row">
+                  {% for t in public_teachers %}
+                  <a
+                    href="{{ url_for('teacher_profile', slug=t.slug) }}"
+                    class="features26-thq-feature-card-elm"
+                  >
+                    <img
+                      alt="{{ t.full_name }}"
+                      src="{{ t.photo_url }}"
+                      class="features26-thq-feature-card-image-elm thq-img-ratio-4-3"
+                    />
+                    <div class="features26-thq-feature-card-content-elm">
+                      <h3 class="features26-thq-feature-card-title-elm thq-heading-3">
+                        {{ t.full_name }}
+                      </h3>
+                      <span class="features26-thq-feature-card-description-elm thq-body-small">
+                        {{ t.tagline }}
+                      </span>
+                    </div>
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </features26-wrapper>
+        <features23-wrapper class="features23-wrapper">
+          <!--Features23 component-->
+          <div id="programs" class="features23-thq-layout349-elm thq-section-padding">
+            <div class="features23-thq-max-width-elm thq-section-max-width">
+              <div class="features23-container1">
+                <h2 class="features23-text10 thq-heading-2">
+                  <fragment class="home-fragment31">
+                    <span class="home-text40">Наши программы</span>
+                  </fragment>
+                </h2>
+              </div>
+              <div class="features23-thq-cards-row thq-grid-3">
+                <div class="features23-container3 thq-card">
+                  <h2 class="thq-heading-2">
+                    <fragment class="home-fragment32">
+                      <span class="home-text41">Программа 9-го класса</span>
+                    </fragment>
+                  </h2>
+                  <span class="features23-text12 thq-body-small">
+                    <fragment class="home-fragment35">
+                      <span class="home-text44">
+                        Подготовка к ОГЭ и устному собеседованию по русскому
+                        языку
+                      </span>
+                    </fragment>
+                  </span>
+                  <img
+                    alt="image"
+                    src="https://play.teleporthq.io/static/svg/default-img.svg"
+                    class="features23-image1"
+                  />
+                </div>
+                <div class="features23-container4 thq-card">
+                  <h2 class="thq-heading-2">
+                    <fragment class="home-fragment33">
+                      <span class="home-text42">Программа 10-го класса</span>
+                    </fragment>
+                  </h2>
+                  <span class="features23-text14 thq-body-small">
+                    <fragment class="home-fragment36">
+                      <span class="home-text45">
+                        Начало подготовки к ЕГЭ, помощь в школьной программе
+                      </span>
+                    </fragment>
+                  </span>
+                  <img
+                    alt="image"
+                    src="https://play.teleporthq.io/static/svg/default-img.svg"
+                    class="features23-image2"
+                  />
+                </div>
+                <div class="features23-container5 thq-card">
+                  <h2 class="thq-heading-2">
+                    <fragment class="home-fragment34">
+                      <span class="home-text43">Программа 11-го класса</span>
+                    </fragment>
+                  </h2>
+                  <span class="features23-text16 thq-body-small">
+                    <fragment class="home-fragment37">
+                      <span class="home-text46">
+                        Подготовка к ЕГЭ и итоговому сочинению, подготовка к
+                        вступительным экзаменам
+                      </span>
+                    </fragment>
+                  </span>
+                  <img
+                    alt="image"
+                    src="https://play.teleporthq.io/static/svg/default-img.svg"
+                    class="features23-image3"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </features23-wrapper>
+        
+
+        <footer3-wrapper class="footer3-wrapper">
+          <!--Footer3 component-->
+          <footer class="footer3-thq-footer4-elm thq-section-padding">
+            <div class="footer3-thq-max-width-elm thq-section-max-width">
+              <div class="footer3-thq-content-elm">
+                <div class="footer3-thq-links-elm">
+                  <div class="footer3-container1">
+                    <span>
+                      <span>Связаться с нами</span>
+                      <br />
+                      <br />
+                      <br />
+                      <span>✉ contact@example.com</span>
+                      <br />
+                      <br />
+                      <span>📞 +7 (XXX) XXX-XX-XX</span>
+                      <br />
+                      <br />
+                      <span>📍 г. Омск, ул. Примерная, 1</span>
+                    </span>
+                  </div>
+                  <div class="footer3-container2">
+                    <span>
+                      <span class="footer3-text23">Ссылки</span>
+                      <br />
+                      <br />
+                      <br />
+                      <span>• Главная</span>
+                      <br />
+                      <br />
+                      <span>• Программы обучения</span>
+                      <br />
+                      <br />
+                      <span>• Преподаватели</span>
+                      <br />
+                    </span>
+                  </div>
+                  <div class="footer3-container3">
+                    <span>
+                      <span>Информация</span>
+                      <br />
+                      <br />
+                      <br />
+                      <span>• О проекте</span>
+                      <br />
+                      <br />
+                      <span>• Политика конфиденциальности</span>
+                      <br />
+                      <br />
+                      <span>• Условия использования</span>
+                      <br />
+                    </span>
+                  </div>
+                  <div class="footer3-container4">
+                    <span>
+                      <span>Социальные сети</span>
+                      <br />
+                      <br />
+                    </span>
+                    <div class="footer3-container5">
+                      <div class="footer3-container6">
+                        <img
+                          alt="image"
+                          src="https://play.teleporthq.io/static/svg/default-img.svg"
+                          class="footer3-image1"
+                        />
+                      </div>
+                      <img
+                        alt="image"
+                        src="https://play.teleporthq.io/static/svg/default-img.svg"
+                        class="footer3-image2"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="footer3-thq-credits-elm">
+                <div class="thq-divider-horizontal"></div>
+                <div class="footer3-thq-row-elm">
+                  <div class="footer3-thq-footer-links-elm">
+                    <span class="thq-body-small">
+                      © 2026. Все права защищены. Разработано Ильёй Коротковым.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </footer3-wrapper>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  function initHorizontalScrollRow(row) {
+    if (!row) return;
+
+    function syncRowLayout() {
+      var overflows = row.scrollWidth > row.clientWidth + 1;
+      row.style.justifyContent = overflows ? 'flex-start' : 'center';
+    }
+
+    syncRowLayout();
+    window.addEventListener('resize', syncRowLayout);
+
+    row.addEventListener('wheel', function (e) {
+      if (row.scrollWidth <= row.clientWidth + 1) return;
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      e.preventDefault();
+      row.scrollLeft += e.deltaY;
+    }, { passive: false });
+  }
+
+  initHorizontalScrollRow(document.querySelector('.features26-thq-row-elm'));
+  initHorizontalScrollRow(document.querySelector('.features23-thq-cards-row'));
+})();
+</script>
+{% endblock %}

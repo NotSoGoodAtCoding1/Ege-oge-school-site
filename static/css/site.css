@@ -1,0 +1,227 @@
+/* Page shell: gradient behind navbar + content (same as index1) */
+.ege-shell {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(
+    180deg,
+    rgb(245, 245, 245) 0%,
+    rgb(193, 236, 238) 100%
+  );
+  background-attachment: fixed;
+}
+
+/* Shared app content area — transparent so shell gradient shows through */
+.ege-app {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+/* Navbar: transparent on all app pages (index1 sets this inline too) */
+.navbar8-container1,
+.navbar8-thq-navbar-interactive-elm,
+header.navbar8-thq-navbar-interactive-elm {
+  background-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none;
+}
+
+/* Compact logo on app pages; index1 keeps full-width hero logo */
+.ege-shell .navbar8-thq-image1-elm.logo {
+  width: auto;
+  height: 8rem;
+  max-width: 12rem;
+  object-fit: contain;
+}
+
+.ege-main {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1140px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 2.5rem;
+  box-sizing: border-box;
+}
+
+.ege-main h1,
+.ege-main .h1,
+.ege-main h2,
+.ege-main .h2 {
+  font-weight: 700;
+  color: #191818;
+}
+
+/* Compact logo in navbar (index1 uses full-width hero logo separately) */
+.logo_small,
+img.logo_small,
+.navbar8-thq-image1-elm.logo_small {
+  width: auto;
+  height: 3rem;
+  max-width: 7rem;
+  object-fit: contain;
+}
+
+.navbar8-logo-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+/* Teleport mobile-menu backdrop: fixed full-screen layer blocks page interaction */
+.navbar8-container8 {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Bootstrap buttons → index1 palette */
+.ege-app .btn,
+.ege-main .btn {
+  border-radius: 12px;
+  font-weight: 500;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.ege-app .btn-primary,
+.ege-main .btn-primary {
+  color: #f7f7f7;
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.ege-app .btn-primary:hover,
+.ege-app .btn-primary:focus,
+.ege-main .btn-primary:hover,
+.ege-main .btn-primary:focus {
+  color: #ffffff;
+  background-color: #222222;
+  border-color: #222222;
+}
+
+.ege-app .btn-secondary,
+.ege-main .btn-secondary {
+  color: #191818;
+  background-color: #ffffff;
+  border-color: rgba(25, 24, 24, 0.15);
+}
+
+.ege-app .btn-secondary:hover,
+.ege-app .btn-secondary:focus,
+.ege-main .btn-secondary:hover,
+.ege-main .btn-secondary:focus {
+  color: #000000;
+  background-color: #f5f5f5;
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+.ege-app .btn-outline-primary,
+.ege-main .btn-outline-primary {
+  color: #000000;
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.ege-app .btn-outline-primary:hover,
+.ege-app .btn-outline-primary:focus,
+.ege-main .btn-outline-primary:hover,
+.ege-main .btn-outline-primary:focus {
+  color: #000000;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-color: #000000;
+}
+
+.ege-app .btn-outline-secondary,
+.ege-main .btn-outline-secondary {
+  color: #ffffff;
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.ege-app .btn-outline-secondary:hover,
+.ege-app .btn-outline-secondary:focus,
+.ege-main .btn-outline-secondary:hover,
+.ege-main .btn-outline-secondary:focus {
+  color: #ffffff;
+  background-color: #222222;
+  border-color: #222222;
+}
+
+.ege-app .list-group-item,
+.ege-main .list-group-item,
+.ege-app .card,
+.ege-main .card {
+  border-radius: 12px;
+}
+
+.ege-app .alert,
+.ege-main .alert {
+  border-radius: 12px;
+}
+
+.ege-app .form-control,
+.ege-app .form-select,
+.ege-main .form-control,
+.ege-main .form-select {
+  border-radius: 8px;
+}
+
+/* Публичная страница преподавателя */
+.teacher-profile {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.teacher-profile-photo-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e8e8e8;
+}
+
+.teacher-profile-photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+}
+
+.teacher-profile-name {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-profile-tagline {
+  margin-bottom: 1.5rem;
+}
+
+.teacher-profile-details dt {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.teacher-profile-details dd {
+  margin: 0;
+}
+
+.teacher-profile-qualifications {
+  white-space: pre-line;
+}
+
+@media (max-width: 767px) {
+  .teacher-profile {
+    grid-template-columns: 1fr;
+  }
+}

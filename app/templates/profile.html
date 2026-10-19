@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block extra_css %}
+    <style>
+        body {
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>Здравствуйте, {{ current_user.username }}!</h1>
+
+    {% if user_course %}
+        <h2>Курс: {{ user_course.course.title }}</h2>
+
+        <!-- Прогресс-бар -->
+        <div class="progress mb-4">
+            <div class="progress-bar" role="progressbar"
+                 style="width: {{ progress|int }}% background-color: #191818;"
+                 aria-valuenow="{{ progress|int }}" aria-valuemin="0" aria-valuemax="100">
+                {{ progress|int }}%
+            </div>
+        </div>
+
+        <!-- Быстрый доступ -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('course_tests', course_id=user_course.course.id) }}" class="btn btn-primary w-100">Тесты</a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('homeworks') }}" class="btn btn-primary w-100">Домашние задания</a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('schedule') }}" class="btn btn-primary w-100">Расписание</a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('course_materials', course_id=user_course.course.id) }}" class="btn btn-primary w-100">Материалы курса</a>
+            </div>
+        </div>
+    {% else %}
+        <p>Вы не записаны ни на один курс. Обратитесь к администратору.</p>
+    {% endif %}
+{% endblock %}

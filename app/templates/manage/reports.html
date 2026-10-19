@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-3">Отчеты (экспорт CSV)</h1>
+<form method="post" class="col-lg-6">
+  {{ form.hidden_tag() }}
+  <p class="mb-3">{{ form.report_type.label(class="form-label") }}{{ form.report_type(class="form-select") }}</p>
+  <p class="mb-3">{{ form.school_class.label(class="form-label") }}{{ form.school_class(class="form-select") }}</p>
+  <p class="mb-3">{{ form.course_id.label(class="form-label") }}{{ form.course_id(class="form-select") }}</p>
+  <p class="mb-3">{{ form.teacher_id.label(class="form-label") }}{{ form.teacher_id(class="form-select") }}</p>
+  <p class="mb-3">{{ form.date_from.label(class="form-label") }}{{ form.date_from(class="form-control") }}</p>
+  <p class="mb-3">{{ form.date_to.label(class="form-label") }}{{ form.date_to(class="form-control") }}</p>
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

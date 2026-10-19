@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<nav class="mb-3"><a href="{{ url_for('teacher_course_hub', course_id=course.id) }}">&larr; {{ course.title }}</a></nav>
+<h1 class="h4 mb-3">{{ title }}</h1>
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card"><div class="card-header">Добавить материал</div><div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-2">{{ form.title.label(class="form-label") }}{{ form.title(class="form-control") }}</div>
+        <div class="mb-2">{{ form.description.label(class="form-label") }}{{ form.description(class="form-control", rows=2) }}</div>
+        <div class="mb-2">{{ form.external_url.label(class="form-label") }}{{ form.external_url(class="form-control", placeholder="https://…") }}</div>
+        <div class="mb-2">
+          <label class="form-label">Файл</label>
+          <input class="form-control" type="file" name="material_file" accept=".pdf,.doc,.docx,.odt,.ods,.xls,.xlsx,.txt,.rtf,.csv,.ppt,.pptx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,text/csv">
+          <div class="form-text">PDF, Word, Excel, ODT/ODS, TXT, RTF, CSV, PowerPoint.</div>
+        </div>
+        <div class="form-check mb-3">{{ form.course_students_only(class="form-check-input") }}{{ form.course_students_only.label(class="form-check-label") }}</div>
+        <button class="btn btn-primary" type="submit">{{ form.submit.label.text }}</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card"><div class="card-header">Список</div><ul class="list-group list-group-flush">
+      {% for m in materials %}
+      <li class="list-group-item">
+        <strong>{{ m.title }}</strong>
+        {% if not m.course_students_only %}<span class="badge bg-info text-dark">Все пользователи</span>{% else %}<span class="badge bg-secondary">Только курс</span>{% endif %}
+        {% if m.description %}<p class="small mb-1">{{ m.description }}</p>{% endif %}
+        {% set safe_url = m.external_url | safe_http_url %}
+        {% if safe_url %}<p class="mb-1"><a href="{{ safe_url }}" target="_blank" rel="noopener noreferrer">{{ safe_url }}</a></p>{% endif %}
+        {% if m.file_path %}<p class="mb-1"><a href="{{ url_for('download_course_material', material_id=m.id) }}" target="_blank" rel="noopener">{{ m._file_label or 'Файл' }}</a></p>{% endif %}
+        <form method="post" action="{{ url_for('teacher_course_material_delete', course_id=course.id, material_id=m.id) }}" class="d-inline" onsubmit="return confirm('Удалить?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
+        </form>
+      </li>
+      {% else %}
+      <li class="list-group-item text-muted">Пока пусто.</li>
+      {% endfor %}
+    </ul></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<nav class="mb-3"><a href="{{ url_for('teacher_file_reviews') }}">&larr; Список</a></nav>
+<h1 class="h4 mb-2">{{ title }}</h1>
+<p class="text-muted small">{{ course.title }} — {{ test.title }} — {{ student.username }}</p>
+<p class="mb-2"><strong>Вопрос:</strong> {{ question.text }}</p>
+{% if submission.file_path %}
+<p><a class="btn btn-sm btn-secondary" href="{{ url_for('download_test_answer_submission', submission_id=submission.id) }}" target="_blank" rel="noopener">Открыть файл</a></p>
+{% endif %}
+<form method="post" class="card card-body mt-3">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">{{ form.teacher_comment.label(class="form-label") }}{{ form.teacher_comment(class="form-control", rows=3) }}</div>
+  <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+</form>
+{% endblock %}

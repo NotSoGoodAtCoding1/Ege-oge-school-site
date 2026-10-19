@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<nav class="mb-3"><a href="{{ url_for('teacher_dashboard') }}">&larr; Кабинет учителя</a></nav>
+<h1 class="h3 mb-3">{{ title }}</h1>
+<div class="btn-group mb-3" role="group">
+  <a class="btn btn-sm {% if status == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %}" href="{{ url_for('teacher_file_reviews', status='pending') }}">Ожидают</a>
+  <a class="btn btn-sm {% if status == 'done' %}btn-primary{% else %}btn-outline-primary{% endif %}" href="{{ url_for('teacher_file_reviews', status='done') }}">Проверены</a>
+  <a class="btn btn-sm {% if status == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}" href="{{ url_for('teacher_file_reviews', status='all') }}">Все</a>
+</div>
+{% if submissions %}
+<div class="table-responsive">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Дата</th><th>Студент</th><th>Курс / тест</th><th>Вопрос</th><th>Статус</th><th></th></tr></thead>
+    <tbody>
+      {% for s in submissions %}
+      <tr>
+        <td>{{ s.submitted_at.strftime('%d.%m.%Y %H:%M') if s.submitted_at else '' }}</td>
+        <td>{{ s.test_result.user.username }}</td>
+        <td>{{ s.test_result.test.course.title if s.test_result.test.course else '—' }} / {{ s.test_result.test.title }}</td>
+        <td class="small">{{ s.question.text[:80] }}{% if s.question.text|length > 80 %}…{% endif %}</td>
+        <td>{% if s.is_reviewed %}<span class="badge bg-success">OK</span>{% else %}<span class="badge bg-warning text-dark">Ждёт</span>{% endif %}</td>
+        <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('teacher_file_review_detail', submission_id=s.id) }}">Открыть</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">Нет записей.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-3">Импорт пользователей</h1>
+<p class="text-muted">CSV колонки: full_name, email, role, class, assigned_courses (semicolon-separated course titles)</p>
+<form method="post" enctype="multipart/form-data" class="col-lg-6">
+  {{ form.hidden_tag() }}
+  <p class="mb-3">{{ form.file.label(class="form-label") }}{{ form.file(class="form-control") }}</p>
+  <p class="mb-3">{{ form.default_password.label(class="form-label") }}{{ form.default_password(class="form-control") }}</p>
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

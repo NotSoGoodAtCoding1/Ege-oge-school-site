@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-3">Пользователи</h1>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-auto"><input class="form-control form-control-sm" name="q" value="{{ search }}" placeholder="Search"></div>
+  <div class="col-auto">
+    <select class="form-select form-select-sm" name="role">
+      <option value="">Все роли</option>
+      <option value="student" {% if role=='student' %}selected{% endif %}>Ученик</option>
+      <option value="teacher" {% if role=='teacher' %}selected{% endif %}>Преподаватель</option>
+      <option value="parent" {% if role=='parent' %}selected{% endif %}>Родитель</option>
+      <option value="admin" {% if role=='admin' %}selected{% endif %}>Администратор</option>
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-sm btn-primary" type="submit">Фильтр</button></div>
+  <div class="col-auto"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_user_form') }}">Новый</a></div>
+  <div class="col-auto"><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_users_import') }}">Импорт</a></div>
+</form>
+<table class="table table-sm table-striped">
+  <thead><tr><th>ID</th><th>Логин</th><th>Email</th><th>Имя</th><th>Роль</th><th>Класс</th><th>Активен</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.id }}</td>
+    <td>{{ u.username }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.full_name or '' }}</td>
+    <td>{{ u.role }}</td>
+    <td>{{ u.school_class or '' }}</td>
+    <td>{% if u.is_active %}yes{% else %}no{% endif %}</td>
+    <td class="text-nowrap">
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_user_detail', user_id=u.id) }}">Просмотр</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_user_form', user_id=u.id) }}">Редактировать</a>
+      {% if u.is_active %}
+      <form method="post" action="{{ url_for('admin_user_deactivate', user_id=u.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-warning" type="submit">Выключить</button></form>
+      {% else %}
+      <form method="post" action="{{ url_for('admin_user_activate', user_id=u.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-success" type="submit">Включить</button></form>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8" class="text-muted">Пользователей нет</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

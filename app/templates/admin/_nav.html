@@ -1,0 +1,9 @@
+<nav class="nav nav-pills flex-wrap gap-2 mb-4">
+  <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">Обзор</a>
+  <a class="nav-link {% if request.endpoint in ('admin_users', 'admin_user_form', 'admin_user_detail', 'admin_users_import') %}active{% endif %}" href="{{ url_for('admin_users') }}">Пользователи</a>
+  <a class="nav-link {% if request.endpoint in ('admin_courses', 'admin_course_form') %}active{% endif %}" href="{{ url_for('admin_courses') }}">Курсы</a>
+  <a class="nav-link" href="{{ url_for('teacher_dashboard') }}">Учитель</a>
+  <a class="nav-link {% if request.endpoint == 'admin_analytics' %}active{% endif %}" href="{{ url_for('admin_analytics') }}">Аналитика</a>
+  <a class="nav-link {% if request.endpoint == 'admin_reports' %}active{% endif %}" href="{{ url_for('admin_reports') }}">Отчёты</a>
+  <a class="nav-link text-muted" href="{{ url_for('admin.index') }}" target="_blank">Flask-Admin</a>
+</nav>

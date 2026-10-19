@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-3">Курсы</h1>
+<p><a class="btn btn-primary btn-sm" href="{{ url_for('admin_course_form') }}">Новый курс</a></p>
+<table class="table table-striped">
+  <thead><tr><th>Название</th><th>Предмет</th><th>Класс</th><th>Преподаватель</th><th></th></tr></thead>
+  <tbody>
+  {% for c in courses %}
+  <tr>
+    <td>{{ c.title }}</td>
+    <td>{{ c.subject or '' }}</td>
+    <td>{{ c.school_class or '' }}</td>
+    <td>{{ c.author.full_name or c.author.username if c.author else '' }}</td>
+    <td class="text-nowrap">
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('teacher_course_hub', course_id=c.id) }}">Хаб</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_course_form', course_id=c.id) }}">Редактировать</a>
+      <form method="post" action="{{ url_for('admin_course_delete', course_id=c.id) }}" class="d-inline" onsubmit="return confirm('Delete?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+      </form>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="text-muted">Курсов нет</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

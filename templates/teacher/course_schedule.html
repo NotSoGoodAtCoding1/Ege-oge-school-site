@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<nav class="mb-3"><a href="{{ url_for('teacher_course_hub', course_id=course.id) }}">&larr; {{ course.title }}</a></nav>
+<h1 class="h4 mb-2">{{ title }}</h1>
+<div class="mb-3">
+  <a class="btn btn-sm btn-secondary" href="{{ url_for('teacher_course_schedule', course_id=course.id, week=current_week-1) }}">Пред. неделя</a>
+  <span class="mx-2">Неделя {{ current_week }}</span>
+  <a class="btn btn-sm btn-secondary" href="{{ url_for('teacher_course_schedule', course_id=course.id, week=current_week+1) }}">След. неделя</a>
+</div>
+<div class="card mb-4"><div class="card-header">Добавить занятие</div><div class="card-body">
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div class="row g-2">
+      <div class="col-md-3">{{ form.start_time.label(class="form-label") }}{{ form.start_time(class="form-control", placeholder="2026-05-12T10:00") }}</div>
+      <div class="col-md-3">{{ form.end_time.label(class="form-label") }}{{ form.end_time(class="form-control") }}</div>
+      <div class="col-md-2">{{ form.week_number.label(class="form-label") }}{{ form.week_number(class="form-control", value=current_week) }}</div>
+      <div class="col-md-4">{{ form.topic.label(class="form-label") }}{{ form.topic(class="form-control") }}</div>
+    </div>
+    <button class="btn btn-primary mt-2" type="submit">{{ form.submit.label.text }}</button>
+  </form>
+</div></div>
+{% if lessons %}
+<table class="table table-sm"><thead><tr><th>Начало</th><th>Конец</th><th>Тема</th><th></th><th></th></tr></thead>
+<tbody>
+  {% for lesson in lessons %}
+  <tr>
+    <td>{{ lesson.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
+    <td>{{ lesson.end_time.strftime('%d.%m.%Y %H:%M') }}</td>
+    <td>{{ lesson.topic }}</td>
+    <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('teacher_course_lesson_attendance', course_id=course.id, lesson_id=lesson.id) }}">Посещаемость</a></td>
+    <td><form method="post" action="{{ url_for('teacher_course_schedule_delete', course_id=course.id, lesson_id=lesson.id) }}" onsubmit="return confirm('Удалить?');"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button></form></td>
+  </tr>
+  {% endfor %}
+</tbody></table>
+{% else %}
+<p class="text-muted">На этой неделе занятий нет.</p>
+{% endif %}
+{% endblock %}

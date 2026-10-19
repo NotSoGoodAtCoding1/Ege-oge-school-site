@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Домашние задания</h1>
+    {% if homeworks %}
+        <div class="list-group">
+            {% for homework in homeworks %}
+                <div class="list-group-item">
+                    <h5>{{ homework.title }}</h5>
+                    <p>{{ homework.description }}</p>
+                    {% if homework.deadline %}
+                        <p>Дедлайн: {{ homework.deadline.strftime('%d.%m.%Y %H:%M') }}</p>
+                    {% endif %}
+                    {% if homework.is_essay %}
+                        {% if homework.submissions|selectattr("user_id", "equalto", current_user.id)|list|length > 0 %}
+                            {% set submission = homework.submissions|selectattr("user_id", "equalto", current_user.id)|first %}
+                            {% if submission.is_approved %}
+                                <span class="badge bg-success">Выполнено (проверено)</span>
+                            {% elif submission.is_rejected %}
+                                <span class="badge bg-danger">Отклонено</span>
+                                {% if submission.rejection_reason %}
+                                <p class="small text-danger mb-2 mt-1"><strong>Комментарий учителя:</strong> {{ submission.rejection_reason }}</p>
+                                {% endif %}
+                                <a href="{{ url_for('submit_homework', homework_id=homework.id) }}" class="btn btn-sm btn-primary">Загрузить снова</a>
+                            {% else %}
+                                <span class="badge bg-warning">Ожидает проверки</span>
+                                <a href="{{ url_for('submit_homework', homework_id=homework.id) }}" class="btn btn-sm btn-secondary">Редактировать</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('submit_homework', homework_id=homework.id) }}" class="btn btn-sm btn-primary">Прикрепить файл</a>
+                        {% endif %}
+                    {% else %}
+                        {% if homework.test %}
+                            {% set test_result = current_user.test_results|selectattr("test_id", "equalto", homework.test.id)|list|length > 0 %}
+                            {% if test_result %}
+                                <span class="badge bg-success">Выполнено</span>
+                            {% else %}
+                                <a href="{{ url_for('take_test', test_id=homework.test.id) }}" class="btn btn-sm btn-primary">Пройти тест</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>У вас нет домашних заданий.</p>
+    {% endif %}
+{% endblock %}

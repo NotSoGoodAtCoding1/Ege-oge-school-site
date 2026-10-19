@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-2">{{ user.full_name or user.username }}</h1>
+<p class="text-muted">{{ user.email }} | {{ user.role }} | class {{ user.school_class or '-' }}</p>
+<p>
+  <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_user_form', user_id=user.id) }}">Редактировать</a>
+  <a class="btn btn-sm btn-secondary" href="{{ url_for('admin_users') }}">Отмена</a>
+</p>
+<h2 class="h5 mt-4">Курсы</h2>
+<ul class="list-group mb-3">
+  {% for c in courses %}<li class="list-group-item">{{ c.title }}</li>{% else %}<li class="list-group-item text-muted">Нет данных</li>{% endfor %}
+</ul>
+<h2 class="h5">Входы</h2>
+<ul class="list-group mb-3">
+  {% for ev in logins %}<li class="list-group-item">{{ ev.logged_at.strftime('%d.%m.%Y %H:%M') }} {{ ev.ip_address or '' }}</li>{% else %}<li class="list-group-item text-muted">None</li>{% endfor %}
+</ul>
+<h2 class="h5">Просмотры материалов</h2>
+<ul class="list-group mb-3">
+  {% for v in views %}<li class="list-group-item">{{ v.viewed_at.strftime('%d.%m.%Y %H:%M') }} — {{ v.material.title }}</li>{% else %}<li class="list-group-item text-muted">None</li>{% endfor %}
+</ul>
+<h2 class="h5">Результаты тестов</h2>
+<ul class="list-group">
+  {% for r in results %}<li class="list-group-item">{{ r.test.title }}: {{ r.score }}/{{ r.total_questions }} ({{ r.completed_at.strftime('%d.%m.%Y') if r.completed_at else '' }})</li>{% else %}<li class="list-group-item text-muted">None</li>{% endfor %}
+</ul>
+{% endblock %}

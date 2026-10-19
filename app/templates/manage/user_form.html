@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include 'manage/nav.html' %}
+<h1 class="h2 mb-3">{{ title }}</h1>
+<form method="post" class="col-lg-8">
+  {{ form.hidden_tag() }}
+  <p class="mb-3">{{ form.username.label(class="form-label") }}{{ form.username(class="form-control") }}</p>
+  <p class="mb-3">{{ form.email.label(class="form-label") }}{{ form.email(class="form-control") }}</p>
+  <p class="mb-3">{{ form.full_name.label(class="form-label") }}{{ form.full_name(class="form-control") }}</p>
+  <p class="mb-3">{{ form.phone.label(class="form-label") }}{{ form.phone(class="form-control") }}</p>
+  <p class="mb-3">{{ form.school_class.label(class="form-label") }}{{ form.school_class(class="form-select") }}</p>
+  <p class="mb-3">{{ form.role.label(class="form-label") }}{{ form.role(class="form-select") }}</p>
+  <p class="mb-3">{{ form.password.label(class="form-label") }}{{ form.password(class="form-control") }}</p>
+  <p class="mb-3">{{ form.password2.label(class="form-label") }}{{ form.password2(class="form-control") }}</p>
+  <p class="mb-3">{{ form.parent_guardian_id.label(class="form-label") }}{{ form.parent_guardian_id(class="form-select") }}</p>
+  <p class="mb-3">{{ form.course_ids.label(class="form-label") }}{{ form.course_ids(class="form-select", size=6, multiple=true) }}</p>
+  <p class="mb-3">{{ form.teacher_course_ids.label(class="form-label") }}{{ form.teacher_course_ids(class="form-select", size=6, multiple=true) }}</p>
+  <p class="mb-3 form-check">{{ form.is_active(class="form-check-input") }}{{ form.is_active.label(class="form-check-label") }}</p>
+  {{ form.submit(class="btn btn-primary") }}
+  <a class="btn btn-secondary" href="{{ url_for('admin_users') }}">Отмена</a>
+</form>
+{% endblock %}

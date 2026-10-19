@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<nav class="mb-3"><a href="{{ url_for('teacher_courses') }}">&larr; Курсы</a></nav>
+<h1 class="h3 mb-1">{{ course.title }}</h1>
+<p class="text-muted mb-4">{{ course.description or '' }}</p>
+<div class="row g-3">
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100"><div class="card-body">
+      <h5 class="card-title">Материалы</h5>
+      <p class="small text-muted">PDF и ссылки, доступ</p>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('teacher_course_materials', course_id=course.id) }}">Управление</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('course_materials', course_id=course.id) }}">Как у студентов</a>
+    </div></div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100"><div class="card-body">
+      <h5 class="card-title">Расписание</h5>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('teacher_course_schedule', course_id=course.id) }}">Управление</a>
+    </div></div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100"><div class="card-body">
+      <h5 class="card-title">Домашние задания</h5>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('teacher_course_homeworks', course_id=course.id) }}">Управление</a>
+    </div></div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100"><div class="card-body">
+      <h5 class="card-title">Тесты</h5>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('course_tests', course_id=course.id) }}">Список</a>
+      <a class="btn btn-outline-primary btn-sm" href="{{ url_for('create_test', course_id=course.id) }}">Новый тест</a>
+    </div></div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100"><div class="card-body">
+      <h5 class="card-title">Курс</h5>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('teacher_course_edit', course_id=course.id) }}">Название и описание</a>
+    </div></div>
+  </div>
+</div>
+{% if tests %}
+<h2 class="h5 mt-4">Тесты</h2>
+<ul class="list-group">
+  {% for t in tests %}
+  <li class="list-group-item d-flex justify-content-between flex-wrap gap-2">
+    <span>{{ t.title }}</span>
+    <span>
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_test', test_id=t.id) }}">Конструктор</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('view_test', test_id=t.id) }}">Просмотр</a>
+    </span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1>Добавить вариант ответа</h1>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.text.label(class="form-label") }}
+            {{ form.text(class="form-control") }}
+            {% for error in form.text.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3 form-check">
+            {{ form.is_correct(class="form-check-input") }}
+            {{ form.is_correct.label(class="form-check-label") }}
+        </div>
+        <div class="mb-3">
+            {{ form.question_id.label(class="form-label") }}
+            {{ form.question_id(class="form-select") }}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+        <a href="{{ url_for('tests') }}" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endblock %}

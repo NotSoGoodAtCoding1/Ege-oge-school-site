@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Расписание занятий</h1>
+
+    <!-- Выбор недели -->
+    <div class="mb-3">
+        <a href="{{ url_for('schedule', week=current_week-1) }}" class="btn btn-secondary">Предыдущая неделя</a>
+        <span class="mx-3">Неделя {{ current_week }}</span>
+        <a href="{{ url_for('schedule', week=current_week+1) }}" class="btn btn-secondary">Следующая неделя</a>
+    </div>
+
+    {% if schedule %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>День</th>
+                        <th>Время</th>
+                        <th>Тема</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in schedule %}
+                        <tr>
+                            <td>{{ lesson.start_time.strftime('%d.%m') }}</td>
+                            <td>{{ lesson.start_time.strftime('%H:%M') }} - {{ lesson.end_time.strftime('%H:%M') }}</td>
+                            <td>{{ lesson.topic }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>Занятий на этой неделе нет.</p>
+    {% endif %}
+{% endblock %}

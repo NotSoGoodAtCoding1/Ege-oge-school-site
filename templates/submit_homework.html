@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Прикрепить файл к заданию: {{ homework.title }}</h1>
+    {% if existing_submission and existing_submission.is_rejected and existing_submission.rejection_reason %}
+    <div class="alert alert-danger">
+        <strong>Работа отклонена.</strong> {{ existing_submission.rejection_reason }}
+    </div>
+    {% endif %}
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label for="file" class="form-label">Выберите файл:</label>
+            <input type="file" class="form-control" id="file" name="file" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Загрузить</button>
+        <a href="{{ url_for('homeworks') }}" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endblock %}

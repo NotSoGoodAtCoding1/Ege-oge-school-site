@@ -1,0 +1,39 @@
+<navbar8-wrapper class="navbar8-wrapper">
+  <header class="navbar8-container1">
+    <header data-thq="thq-navbar" class="navbar8-thq-navbar-interactive-elm">
+      <a href="{{ url_for('index') }}" class="navbar8-logo-link">
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="Логотип"
+          class="navbar8-thq-image1-elm logo"
+          width="48"
+          height="48"
+        >
+      </a>
+      <div data-thq="thq-navbar-nav" class="navbar8-thq-desktop-menu-elm">
+        <div class="navbar8-thq-buttons-elm1">
+          {% if current_user.is_authenticated %}
+          <a href="{{ cabinet_url() }}" class="navbar8-thq-action1-elm1 thq-button-animated thq-button-filled thq-link">
+            <span class="navbar8-text11"><span class="home-text18">Личный кабинет</span></span>
+          </a>
+          {% if show_student_tests_nav() %}
+          <a href="{{ url_for('tests') }}" class="navbar8-thq-action2-elm1 thq-button-outline thq-button-animated thq-link">
+            <span><span class="home-text19">Тесты</span></span>
+          </a>
+          {% endif %}
+          <a href="{{ url_for('logout') }}" class="navbar8-thq-action2-elm1 thq-button-outline thq-button-animated thq-link">
+            <span><span class="home-text19">Выйти</span></span>
+          </a>
+          {% else %}
+          <a href="{{ url_for('login') }}" class="navbar8-thq-action1-elm1 thq-button-animated thq-button-filled thq-link">
+            <span class="navbar8-text11"><span class="home-text18">Войти</span></span>
+          </a>
+          <a href="{{ url_for('register') }}" class="navbar8-thq-action2-elm1 thq-button-outline thq-button-animated thq-link">
+            <span><span class="home-text19">Регистрация</span></span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+  </header>
+</navbar8-wrapper>

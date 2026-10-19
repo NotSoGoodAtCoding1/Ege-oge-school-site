@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ test.title }}</h1>
+    <p>{{ test.description }}</p>
+
+    <form method="POST" action="" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% for question in test.questions %}
+            {% set qt = question.question_type or 'single_choice' %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        {% if qt == 'file_upload' %}
+                            <span class="badge text-bg-warning text-dark">Файл / скан</span>
+                        {% elif qt == 'multiple_choice' %}
+                            <span class="badge text-bg-info text-dark">Несколько верных</span>
+                        {% elif qt == 'text_answer' %}
+                            <span class="badge text-bg-secondary">Текстовый ответ</span>
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title">{{ question.text }}</h5>
+                    {% if qt == 'file_upload' %}
+                        <div class="card-text">
+                            <label class="form-label" for="file_question_{{ question.id }}">Прикрепите фото или файл ответа</label>
+                            <input class="form-control" type="file" name="file_question_{{ question.id }}" id="file_question_{{ question.id }}" accept="image/*,.pdf,.doc,.docx" required>
+                            <div class="form-text">Файл будет доступен учителю для проверки.</div>
+                        </div>
+                    {% elif qt == 'text_answer' %}
+                        <div class="card-text">
+                            <label class="form-label" for="question_{{ question.id }}">Ваш ответ</label>
+                            <input class="form-control" type="text" name="question_{{ question.id }}" id="question_{{ question.id }}" maxlength="500" required autocomplete="off">
+                            <div class="form-text">Ответ проверяется автоматически по эталону учителя.</div>
+                        </div>
+                    {% elif question.options %}
+                        <div class="card-text">
+                            {% for option in question.options %}
+                                <div class="form-check">
+                                    {% if qt == 'multiple_choice' %}
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="question_{{ question.id }}"
+                                            id="option_{{ option.id }}"
+                                            value="{{ option.id }}"
+                                        >
+                                    {% else %}
+                                        <input
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="question_{{ question.id }}"
+                                            id="option_{{ option.id }}"
+                                            value="{{ option.id }}"
+                                            required
+                                        >
+                                    {% endif %}
+                                    <label class="form-check-label" for="option_{{ option.id }}">
+                                        {{ option.text }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            {% if qt == 'multiple_choice' %}
+                                <div class="form-text">Отметьте все верные варианты.</div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Нет вариантов ответа.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Завершить тест</button>
+        <a href="{{ url_for('view_test', test_id=test.id) }}" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endblock %}

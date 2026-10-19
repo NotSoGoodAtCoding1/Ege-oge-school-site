@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<nav class="mb-3"><a href="{{ url_for('index') }}">Главная</a> / <a href="{{ url_for('course_tests', course_id=course.id) }}">{{ course.title }}</a></nav>
+<h1 class="h3 mb-3">{{ title }}</h1>
+{% if can_manage %}<p><a class="btn btn-sm btn-outline-primary" href="{{ url_for('teacher_course_materials', course_id=course.id) }}">Редактировать (учитель)</a></p>{% endif %}
+{% if materials %}
+<ul class="list-group">
+  {% for m in materials %}
+  <li class="list-group-item">
+    <strong>{{ m.title }}</strong>
+    {% if not m.course_students_only %}<span class="badge bg-info text-dark">Для всех авторизованных</span>{% else %}<span class="badge bg-secondary">Только для текущего курса</span>{% endif %}
+    {% if m.description %}<p class="small mb-1 mt-1">{{ m.description }}</p>{% endif %}
+    <div class="d-flex flex-wrap gap-2">
+      {% set safe_url = m.external_url | safe_http_url %}
+      {% if safe_url %}<a class="btn btn-sm btn-primary" href="{{ safe_url }}" target="_blank" rel="noopener noreferrer">Внешняя ссылка</a>{% endif %}
+      {% if m.file_path %}<a class="btn btn-sm btn-secondary" href="{{ url_for('download_course_material', material_id=m.id) }}" target="_blank" rel="noopener">{{ m._file_label or 'Скачать файл' }}</a>{% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="text-muted">Материалов пока нет.</p>
+{% endif %}
+{% endblock %}
