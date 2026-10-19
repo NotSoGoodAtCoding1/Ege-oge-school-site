@@ -13,7 +13,7 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'postgresql://@localhost:5432',
+        'mysql+pymysql://root@localhost:3306/eg_ege_school',
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
