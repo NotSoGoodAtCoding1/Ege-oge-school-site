@@ -273,6 +273,10 @@ def init_routes(app):
     def login():
         if current_user.is_authenticated:
             return redirect(url_for('index'))
+        
+        # Check for admin bypass mode via query parameter
+        bypass_mode = request.args.get('bypass_admin', '').strip().lower() == 'true'
+        
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(username=form.username.data).first()
@@ -292,10 +296,93 @@ def init_routes(app):
             return redirect(url_for('index'))
         return render_template('login.html', title='Вход', form=form)
 
+    @app.route('/admin/login', methods=['GET', 'POST'])
+    def admin_login():
+        """Admin bypass login - creates an admin user if none exists in the database."""
+        from flask import flash
+        
+        # If already logged in as admin, redirect to dashboard
+        if current_user.is_authenticated and is_admin_user(current_user):
+            return redirect(url_for('admin_dashboard'))
+        
+        form = LoginForm()
+        
+        if request.method == 'POST':
+            username = request.form.get('username', '').strip().lower()
+            password = request.form.get('password', '')
+            
+            # Check if any admin user exists
+            existing_admin = User.query.filter_by(role='admin').first()
+            
+            if not existing_admin:
+                # No admin exists - create one
+                try:
+                    # Use the provided username or default to 'admin'
+                    admin_username = username if username else 'admin'
+                    
+                    # Check if this username is already taken (by any user)
+                    existing_user = User.query.filter_by(username=admin_username).first()
+                    if existing_user:
+                        flash(f'Пользователь "{admin_username}" уже существует. Используйте другое имя или пароль.', 'warning')
+                        return redirect(url_for('admin_login'))
+                    
+                    # Create admin user
+                    new_admin = User(
+                        username=admin_username,
+                        email='admin@system.local',  # Placeholder email
+                        full_name='Администратор системы',
+                        role='admin',
+                        is_active=True
+                    )
+                    new_admin.set_password(password)
+                    
+                    db.session.add(new_admin)
+                    db.session.commit()
+                    
+                    # Log the admin creation event
+                    try:
+                        db.session.add(LoginEvent(user_id=new_admin.id, ip_address=request.remote_addr))
+                        db.session.commit()
+                    except Exception:
+                        pass
+                    
+                    flash(f'Администратор "{admin_username}" успешно создан и авторизован!', 'success')
+                    
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Ошибка при создании администратора: {str(e)}', 'danger')
+                    return redirect(url_for('admin_login'))
+            else:
+                # Admin exists - validate credentials normally
+                user = User.query.filter_by(username=username).first()
+                if user is None or not user.check_password(password):
+                    flash('Неверное имя пользователя или пароль', 'danger')
+                    return redirect(url_for('admin_login'))
+                
+                try:
+                    user.last_login_at = datetime.utcnow()
+                    db.session.add(LoginEvent(user_id=user.id, ip_address=request.remote_addr))
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
+                
+                login_user(user)
+                flash('Вы успешно вошли как администратор!', 'success')
+        
+        return render_template('login.html', title='Вход для администратора (пустая база данных)', form=form)
+
     @app.route('/logout')
     def logout():
         logout_user()
         return redirect(url_for('index'))
+
+    @app.context_processor
+    def inject_admin_exists():
+        """Check if admin user exists in database for template rendering."""
+        from app.models import User
+        with app.app_context():
+            has_admin = User.query.filter_by(role='admin').first() is not None
+        return dict(has_admin=has_admin)
 
     @app.route('/register', methods=['GET', 'POST'])
     def register():

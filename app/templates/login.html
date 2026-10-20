@@ -9,7 +9,7 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>Вход</h1>
+    <h1>{{ title }}</h1>
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <div class="mb-3">
@@ -26,4 +26,10 @@
         </div>
         <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
     </form>
+    
+    {% if title == 'Вход для администратора (пустая база данных)' %}
+    <p class="mt-3 text-muted">
+        <small>Для входа как обычный пользователь используйте <a href="{{ url_for('login') }}">обычную страницу входа</a></small>
+    </p>
+    {% endif %}
 {% endblock %}
